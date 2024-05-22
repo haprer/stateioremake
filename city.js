@@ -6,7 +6,7 @@ import { Sides, Side} from "./main";
 class City extends Phaser.GameObjects.Container { 
 
     // Default constructor - 
-        /**
+        /** Create with a radius of 10 
      * @param {Phaser.Scene} scene - 
      * @param {Side} side - A side object includes the color of each state
      */
