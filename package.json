@@ -12,6 +12,7 @@
     "vite": "^5.2.0"
   },
   "dependencies": {
+    "eslint": "^9.3.0",
     "phaser": "^3.80.1"
   }
 }

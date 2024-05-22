@@ -1,14 +1,40 @@
 import './style.css'
 import Phaser from 'phaser'
+import City from './city';
+
 
 
 const bgSize = 500;
+const cityLocations = [[400,150],[250,160],[140,180],[60,200],[360, 300],[250,350],[120,290]];
+
+
+export class Side { 
+  
+    /**
+     * @param {integer} num - 
+     * @param {integer} color
+     */
+  constructor(num, color) { 
+    this.num = num; 
+    this.color = color;
+  }
+} 
+
+export const Sides = { 
+  PLAYER: new Side(1, 0x0000FF),
+  NEUTRAL: new Side(0, 0x333333),
+  RED: new Side(2, 0xFF0000), 
+  GREEN: new Side(3, 0x00FF00),
+  PURPLE: new Side(4, 0xc300ff)
+}
 
 
 class GameScene extends Phaser.Scene { 
   constructor() { 
     super("scene-game"); 
 
+    /** @type {Array<City>} */
+    this.cities = []
   }
 
   preload() {
@@ -19,7 +45,15 @@ class GameScene extends Phaser.Scene {
   create() {
     this.add.image(0,0, "usaMap").setOrigin(0,0);
 
-    this.add.circle(bgSize/2, bgSize / 2, 10, 0xff0000,1);
+    for (let i = 0; i < 7; i++) { 
+      let x = cityLocations[i][0];
+      let y = cityLocations[i][1];
+      let city = new City(this, x, y, Sides.NEUTRAL);
+      console.log(`city location set to ${x}, ${y}`);
+      this.cities.push(city);
+    }
+
+    this.cities[0].setSide(Sides.PLAYER);
 
   } 
 
