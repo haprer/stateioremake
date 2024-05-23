@@ -35,6 +35,10 @@ class GameScene extends Phaser.Scene {
 
     /** @type {Array<City>} */
     this.cities = []
+    /**@type {City}  */
+    this.selected;
+
+    this.pointerLocation = [0,0]; //the current location of the pointer (while pressed);
   }
 
   preload() {
@@ -50,16 +54,29 @@ class GameScene extends Phaser.Scene {
       let y = cityLocations[i][1];
       let city = new City(this, x, y, Sides.NEUTRAL);
       console.log(`city location set to ${x}, ${y}`);
+      city.on(Phaser.Input.Events.POINTER_DOWN, (pointer) => this.handlePointerDown(pointer, city));
       this.cities.push(city);
     }
 
     this.cities[0].setSide(Sides.PLAYER);
+
 
   } 
 
   update() {
 
   } 
+
+  /**
+   * 
+   * @param {Phaser.Input.Pointer} pointer 
+   * @param {City} city
+   */
+  handlePointerDown(pointer, city) { 
+    console.log(`(${pointer.x}, ${pointer.y})`);
+    this.selected = city; 
+
+  }
 
 }
 
