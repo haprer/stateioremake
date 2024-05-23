@@ -35,10 +35,14 @@ class GameScene extends Phaser.Scene {
 
     /** @type {Array<City>} */
     this.cities = []
+
+    //this section used for detecting click and drag events 
     /**@type {City}  */
     this.selected;
-
     this.pointerLocation = [0,0]; //the current location of the pointer (while pressed);
+    /** @type {Phaser.GameObjects.Graphics}*/
+    this.dragLine; //used to mark where the user is draging the cursor from the last clicked city 
+
   }
 
   preload() {
@@ -59,12 +63,22 @@ class GameScene extends Phaser.Scene {
     }
 
     this.cities[0].setSide(Sides.PLAYER);
+    
+    // Create the triangle graphics object
+    this.dragLine = this.add.graphics();
 
+    this.input.on(Phaser.Input.Events.POINTER_MOVE, (pointer) => {
+      this.pointerLocation = [pointer.x, pointer.y];
+    });
+
+    this.input.on(Phaser.Input.Events.POINTER_UP, (pointer) => { 
+
+    });
 
   } 
 
   update() {
-
+    // console.log(`Pointer location: ${this.pointerLocation}`);
   } 
 
   /**
@@ -73,10 +87,11 @@ class GameScene extends Phaser.Scene {
    * @param {City} city
    */
   handlePointerDown(pointer, city) { 
-    console.log(`(${pointer.x}, ${pointer.y})`);
+    this.pointerLocation = [pointer.x, pointer.y];
+    console.log(`Click Event at ${this.pointerLocation})`);
     this.selected = city; 
-
   }
+
 
 }
 
