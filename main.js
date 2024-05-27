@@ -35,13 +35,16 @@ class GameScene extends Phaser.Scene {
 
     /** @type {Array<City>} */
     this.cities = []
+    
+    /** @type {Phaser.GameObjects.Image} */
+    this.background; 
 
     //this section used for detecting click and drag events 
     /**@type {City}  */
     this.selected;
     this.pointerLocation = [0,0]; //the current location of the pointer (while pressed);
     /** @type {Phaser.GameObjects.Graphics}*/
-    this.dragLine; //used to mark where the user is draging the cursor from the last clicked city 
+    this.dragLine = null; //used to mark where the user is draging the cursor from the last clicked city 
 
   }
 
@@ -51,14 +54,15 @@ class GameScene extends Phaser.Scene {
   } 
 
   create() {
-    this.add.image(0,0, "usaMap").setOrigin(0,0);
+    this.background = this.add.image(0,0, "usaMap").setOrigin(0,0).setInteractive();
+
 
     for (let i = 0; i < 7; i++) { 
       let x = cityLocations[i][0];
       let y = cityLocations[i][1];
       let city = new City(this, x, y, Sides.NEUTRAL);
       console.log(`city location set to ${x}, ${y}`);
-      city.on(Phaser.Input.Events.POINTER_DOWN, (pointer) => this.handlePointerDown(pointer, city));
+      city.on(Phaser.Input.Events.POINTER_DOWN, (pointer) => this.cityClick(pointer, city), this);
       this.cities.push(city);
     }
 
@@ -67,29 +71,73 @@ class GameScene extends Phaser.Scene {
     // Create the triangle graphics object
     this.dragLine = this.add.graphics();
 
-    this.input.on(Phaser.Input.Events.POINTER_MOVE, (pointer) => {
-      this.pointerLocation = [pointer.x, pointer.y];
-    });
+    this.input.on(Phaser.Input.Events.POINTER_MOVE, this.pointerMove, this);
 
-    this.input.on(Phaser.Input.Events.POINTER_UP, (pointer) => { 
-
-    });
-
+    this.background.on(Phaser.Input.Events.POINTER_DOWN, this.backgroundClick, this);
   } 
 
   update() {
     // console.log(`Pointer location: ${this.pointerLocation}`);
   } 
 
+
+  /**
+   * 
+   * @param {Phaser.Input.Pointer} pointer 
+   */
+  pointerMove(pointer) { 
+    // console.log("Pointer Move"); 
+    if (this.selected != null) { 
+      // console.log("Drag logic");
+      this.dragLine.clear(); 
+      this.dragLine.setVisible(true); 
+      // this.dragLine.lineStyle(3, 0x999999, .2); 
+      this.dragLine.fillStyle(0x999999, .5);
+      this.dragLine.beginPath();
+      let a = new Phaser.Math.Vector2(pointer.x - this.selected.x, pointer.y - this.selected.y); 
+      a.rotate(Phaser.Math.PI2 / 4);
+      a.setLength(this.selected.radius); 
+      let b = new Phaser.Math.Vector2(pointer.x - this.selected.x, pointer.y - this.selected.y); 
+      b.rotate(-(Phaser.Math.PI2 / 4));
+      b.setLength(this.selected.radius); 
+      this.dragLine.moveTo(pointer.x, pointer.y);
+      this.dragLine.lineTo(this.selected.x + a.x, this.selected.y + a.y);
+      this.dragLine.lineTo(this.selected.x + b.x, this.selected.y + b.y); // Example third point
+      this.dragLine.closePath();
+      this.dragLine.fillPath();
+      this.dragLine.strokePath();
+    } else { 
+      this.dragLine.setVisible(false);
+    }
+  }
+
   /**
    * 
    * @param {Phaser.Input.Pointer} pointer 
    * @param {City} city
    */
-  handlePointerDown(pointer, city) { 
+  cityClick(pointer, city) { 
     this.pointerLocation = [pointer.x, pointer.y];
-    console.log(`Click Event at ${this.pointerLocation})`);
-    this.selected = city; 
+    console.log(`City Click at ${this.pointerLocation})`);
+    if (city.isPlayer()) { 
+      this.selected = city; 
+    } else if (this.selected != null) { 
+      //the selected city sends its pop to the new city, capturing it if possible.
+      //create a web worker to handle the transfer of population
+      this.selected.sendPopTo(city);
+    }
+  }
+
+  /**
+   * 
+   * @param {Phaser.Input.Pointer} pointer 
+   */
+  backgroundClick(pointer) { 
+    console.log("Background Click");
+    
+    this.selected = null;
+    this.dragLine.clear();
+    this.dragLine.setVisible(false);
   }
 
 
