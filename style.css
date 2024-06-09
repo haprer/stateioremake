@@ -1,7 +1,7 @@
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  --liClr: #ded3d3;
-  --dkClr: #060814;
+  --bgClr: #293a41;
+  --txtClr: white;
   --accClr: #4582cc;
 }
 
@@ -16,8 +16,8 @@ html, body{
 }
 
 body { 
-  background-color: var(--liClr);
-  color: var(--dkClr);
+  background-color: var(--bgClr);
+  color: var(--txtClr);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
