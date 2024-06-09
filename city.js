@@ -21,25 +21,70 @@ class City extends Phaser.GameObjects.Container {
         this.pop = default_pop;
         this.radius = default_radius;
 
+
+        //create the graphics and physics locations
+
+        //the city box needs to encompass both the text and the circle 
+        this.fontSize = 11; 
+        this.padding = 8; //size between circle and text as well as padding around the city as a whole
+        /**
+         *  *******************
+         *  *\\\\\padding\\\\\*
+         *  *\\             \\*
+         *  *\\   Circle    \\*
+         *  *\\             \\*
+         *  *\\\\\\\\\\\\\\\\\*
+         *  *\\    Text     \\*
+         *  *\\\\\\\\\\\\\\\\\*
+         *  *******************
+         * 
+         */
+
         //Add this city to the scene 
-        this.circle = this.scene.add.circle(0, 0, this.radius, this.side.color, 1); //x, y, color, alpha 
-        this.label = this.scene.add.text( -(this.radius), (this.radius * 1.5), `${this.pop}` );
-        this.location = [x,y];
 
-        this.add(this.circle);
-        this.add(this.label);
+        var h = this.padding + this.radius * 2 + this.padding + this.fontSize + this.padding; 
+        var w = this.padding + this.radius * 2 + this.padding; 
 
-        this.setSize(this.circle.width, this.circle.height);
-        //set the clickable area to the circle -> remember 0,0 is upper left of this object so circle should be drawn at radius distance down 
-        this.setInteractive(new Phaser.Geom.Circle(this.radius, this.radius, this.radius), Phaser.Geom.Circle.Contains);
+        //size and position of the city container graphics
+        this.setSize(w, h);
+
+        this.setPosition(x, y); 
+
+
+        //set the clickable area 
+        this.setInteractive(new Phaser.Geom.Rectangle(0, 0, w, h), Phaser.Geom.Rectangle.Contains);
 
 
         // Add the container to the scene
         this.scene.add.existing(this);
 
-        this.setPosition(x, y); 
+        this.scene.physics.add.existing(this); 
+
+        this.body.setSize(w, h); 
+        this.body.setImmovable(true);
 
 
+
+        this.circle = this.scene.add.circle(0, 0, this.radius, this.side.color, 1); //x, y, color, alpha 
+        this.label = 
+        this.scene.add.text(0, 0, `${this.pop}`, {
+            fontSize: `${this.fontSize}px`, 
+            color: '#000000',
+            align: 'center',
+        } );
+        
+        this.circle.setOrigin(.5, .5); 
+        this.label.setOrigin(.5, .5); 
+
+        const circleY = (this.radius + this.padding ) - (h/2)
+        const textY = (this.radius * 2 + this.padding * 2 + this.fontSize /2) - (h/2)
+        
+        this.circle.y = circleY; 
+        this.label.y = textY; 
+
+
+        this.add(this.circle);
+        this.add(this.label);
 
     }
 
@@ -56,9 +101,8 @@ class City extends Phaser.GameObjects.Container {
      * @param {City} target 
      */
     sendPopTo(target) { 
-        //record the current population of this city, and generate little circles that fly towards the target
-        //city until the population is 0.
-        while (this.pop > 0) {
+        // generate little circles that fly towards the target
+        while (this.pop > 1) { //TODO: release a precalculated number of pop instead of down to 0
             const popCircle = this.scene.add.circle(this.x, this.y, 5, this.side.color, 1);
             this.scene.physics.add.existing(popCircle);
             this.pop--; 
@@ -67,13 +111,35 @@ class City extends Phaser.GameObjects.Container {
                 this.scene.physics.moveToObject(popCircle, target, 100);
                 this.scene.physics.add.collider(popCircle, target, (popCircle, target) => {
                     popCircle.destroy();
-                    target.attack(this.side);
-    
+                    target.hit(popCircle, this.side);
                 });
             } else { 
                 console.log("Error: popCircle or target is null");
             }
  
+        }
+    }
+
+    /**
+     * 
+     * @param {Phaser.GameObjects.Arc} pop //the circle that just hit this city
+     * @param {Side} side //the side of the population 
+     * 
+     * The circle will be removed and the population of the city will be updated  
+     */
+    hit(pop, side) {  
+        if (side == Sides.NEUTRAL) { //for testing purposes only : TODO calculate wether to increase / decrease / change side /etc
+            //or use color as a stand in for side? 
+            console.log(`Hit from (${pop.color})`);
+            this.pop = this.pop-1; 
+            if(this.pop <= 0) { 
+                this.setSide(Sides.PLAYER); 
+                console.log("City Captured TODO: Change color")
+            } else { 
+                this.label.setText(`${this.pop}`)
+            }
+            
+
         }
     }
 
