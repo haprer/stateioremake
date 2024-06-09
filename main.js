@@ -81,7 +81,7 @@ class GameScene extends Phaser.Scene {
 
 
     // Manage collisions between the moving populations 
-    this.physics.add.collider(popGroup, popGroup, (popCircle1, popCircle2) => {
+    this.physics.add.collider(this.popGroup, this.popGroup, (popCircle1, popCircle2) => {
       //TODO: If they are not from the same side, they both die
       //otherwise pass over eachother. (TODO: test is this default behavior?)
     });

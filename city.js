@@ -21,6 +21,7 @@ class City extends Phaser.GameObjects.Container {
         this.side = side; 
         this.pop = default_pop;
         this.radius = default_radius;
+        this.popGroup = popGroup;
 
 
         //create the graphics and physics locations
