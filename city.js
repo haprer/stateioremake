@@ -11,8 +11,9 @@ class City extends Phaser.GameObjects.Container {
         /** Create with a radius of 10 
      * @param {Phaser.Scene} scene - 
      * @param {Side} side - A side object includes the color of each state
+     * @param {Phaser.Physics.Arcade.Group} popGroup - A group for all population circles (for managing collisions between them)
      */
-    constructor(scene, x, y, side) {
+    constructor(scene, x, y, side, popGroup) {
         super(scene, x, y);
 
         //class state 
@@ -26,7 +27,7 @@ class City extends Phaser.GameObjects.Container {
 
         //the city box needs to encompass both the text and the circle 
         this.fontSize = 11; 
-        this.padding = 8; //size between circle and text as well as padding around the city as a whole
+        this.padding = 5; //size between circle and text as well as padding around the city as a whole
         /**
          *  *******************
          *  *\\\\\padding\\\\\*
@@ -76,6 +77,8 @@ class City extends Phaser.GameObjects.Container {
         this.circle.setOrigin(.5, .5); 
         this.label.setOrigin(.5, .5); 
 
+
+        //the locations are relative to the origin at container center eg (0,0) for object = (this.width/2, this.height/2) in container
         const circleY = (this.radius + this.padding ) - (h/2)
         const textY = (this.radius * 2 + this.padding * 2 + this.fontSize /2) - (h/2)
         
@@ -102,22 +105,52 @@ class City extends Phaser.GameObjects.Container {
      */
     sendPopTo(target) { 
         // generate little circles that fly towards the target
-        while (this.pop > 1) { //TODO: release a precalculated number of pop instead of down to 0
-            const popCircle = this.scene.add.circle(this.x, this.y, 5, this.side.color, 1);
-            this.scene.physics.add.existing(popCircle);
-            this.pop--; 
-            this.label.setText(`${this.pop}`);
-            if (popCircle && target) { 
-                this.scene.physics.moveToObject(popCircle, target, 100);
-                this.scene.physics.add.collider(popCircle, target, (popCircle, target) => {
-                    popCircle.destroy();
-                    target.hit(popCircle, this.side);
-                });
-            } else { 
-                console.log("Error: popCircle or target is null");
-            }
- 
+        this.sendPop(target, this.pop - 1); //send all the current population but one to the target city
+        
+    }
+
+    /**
+     * 
+     * @param {City} target 
+     * @param {integer} remaining 
+     * @returns 
+     */
+    sendPop(target, remaining) { 
+        if (remaining <= 0) { 
+            console.log(`city::sendPop finished`); 
+            return; 
         }
+        if (this.pop <= 1) { 
+            //the pop must have dropped (probably from other attackers entering)
+            //cancel the movement 
+
+            console.log(`city::sendPop finished (population 0)`);
+            return;
+        }
+        
+        const popCircle = this.scene.add.circle(this.x, this.y, 5, this.side.color, 1);
+        this.scene.physics.add.existing(popCircle);
+        this.popGroup.add(popCircle);
+        this.pop--; 
+        this.label.setText(`${this.pop}`);
+        if (popCircle && target) { 
+            this.scene.physics.moveToObject(popCircle, target, 100);
+
+            //collision event with target city
+            this.scene.physics.add.collider(popCircle, target, (popCircle, target) => {
+                popCircle.destroy();
+                target.hit(popCircle, this.side);
+            });
+
+        } else { 
+            console.log("Error: popCircle or target is null");
+        }    
+        
+        //schedule the next pop to be send 
+        var taskID = setTimeout(() => {
+            this.sendPop(target, remaining - 1)
+        }, 500); 
+    
     }
 
     /**

@@ -46,6 +46,9 @@ class GameScene extends Phaser.Scene {
     /** @type {Phaser.GameObjects.Graphics}*/
     this.dragLine = null; //used to mark where the user is draging the cursor from the last clicked city 
 
+    /** @type {Phaser.Physics.Arcade.Group} */
+    this.popGroup = null; 
+
   }
 
   preload() {
@@ -55,12 +58,13 @@ class GameScene extends Phaser.Scene {
 
   create() {
     this.background = this.add.image(0,0, "usaMap").setOrigin(0,0).setInteractive();
+    this.popGroup = this.physics.add.group(); // Group for pop objects
 
 
     for (let i = 0; i < 7; i++) { 
       let x = cityLocations[i][0];
       let y = cityLocations[i][1];
-      let city = new City(this, x, y, Sides.NEUTRAL);
+      let city = new City(this, x, y, Sides.NEUTRAL, this.popGroup);
       console.log(`city location set to ${x}, ${y}`);
       city.on(Phaser.Input.Events.POINTER_DOWN, (pointer) => this.cityClick(pointer, city), this);
       this.cities.push(city);
@@ -74,6 +78,15 @@ class GameScene extends Phaser.Scene {
     this.input.on(Phaser.Input.Events.POINTER_MOVE, this.pointerMove, this);
 
     this.background.on(Phaser.Input.Events.POINTER_DOWN, this.backgroundClick, this);
+
+
+    // Manage collisions between the moving populations 
+    this.physics.add.collider(popGroup, popGroup, (popCircle1, popCircle2) => {
+      //TODO: If they are not from the same side, they both die
+      //otherwise pass over eachother. (TODO: test is this default behavior?)
+    });
+
+
   } 
 
   update() {
@@ -125,6 +138,12 @@ class GameScene extends Phaser.Scene {
       //the selected city sends its pop to the new city, capturing it if possible.
       //create a web worker to handle the transfer of population
       this.selected.sendPopTo(city);
+      console.log(`Population send started`);
+
+      //get rid of the drag graphics. 
+      this.selected = null;
+      this.dragLine.clear(); 
+      this.dragLine.setVisible(false); 
     }
   }
 
