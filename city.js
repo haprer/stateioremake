@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 import { Sides, Side} from "./main";
+import settings from "./gamesettings";
 
 
-export const default_pop = 20; 
 export const default_radius = 10;
 
 class City extends Phaser.GameObjects.Container { 
@@ -19,7 +19,7 @@ class City extends Phaser.GameObjects.Container {
         //class state 
         this.scene = scene;
         this.side = side; 
-        this.pop = default_pop;
+        this.pop = settings.default_pop;
         this.radius = default_radius;
         this.popGroup = popGroup;
 
@@ -90,7 +90,16 @@ class City extends Phaser.GameObjects.Container {
         this.add(this.circle);
         this.add(this.label);
 
+
+        this.popTaskID = null; //the task id for the population sending task
+
     }
+
+    incrementPop() {
+        this.pop++;
+        this.label.setText(`${this.pop}`);
+    }
+
 
     /**
      * 
@@ -105,6 +114,11 @@ class City extends Phaser.GameObjects.Container {
      * @param {City} target 
      */
     sendPopTo(target) { 
+
+        if (this.popTaskID) { 
+            clearTimeout(this.popTaskID); 
+        }
+
         // generate little circles that fly towards the target
         this.sendPop(target, this.pop - 1); //send all the current population but one to the target city
         
@@ -148,9 +162,9 @@ class City extends Phaser.GameObjects.Container {
         }    
         
         //schedule the next pop to be send 
-        var taskID = setTimeout(() => {
+        this.popTaskID = setTimeout(() => {
             this.sendPop(target, remaining - 1)
-        }, 500); 
+        }, settings.pop_rate); 
     
     }
 

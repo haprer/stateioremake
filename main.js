@@ -1,6 +1,7 @@
 import './style.css'
 import Phaser from 'phaser'
 import City from './city';
+import PlayerManager from './playermanager';
 
 
 
@@ -87,6 +88,9 @@ class GameScene extends Phaser.Scene {
     });
 
 
+    //start the game logic and ai controllers 
+    this.playerManager = new PlayerManager();
+    this.playerManager.addCity(this.cities[0]);
   } 
 
   update() {
