@@ -1,5 +1,6 @@
 
 import SideManager from "./sidemanager";
+import settings from "./gamesettings";
 
 class NeutralManager extends SideManager {
     constructor() {
@@ -17,9 +18,11 @@ class NeutralManager extends SideManager {
 
     increasePopulation() { 
         this.cities.forEach(city => {
-            if (city.pop < settings.max_pop) city.incrementPop();
+            if (city.pop < settings.neutral_max_pop) city.incrementPop();
         }); 
     }
 
 
 }
+
+export default NeutralManager;

@@ -2,6 +2,7 @@ import './style.css'
 import Phaser from 'phaser'
 import City from './city';
 import PlayerManager from './playermanager';
+import NeutralManager from './neutralmanager';
 
 
 
@@ -70,8 +71,6 @@ class GameScene extends Phaser.Scene {
       city.on(Phaser.Input.Events.POINTER_DOWN, (pointer) => this.cityClick(pointer, city), this);
       this.cities.push(city);
     }
-
-    this.cities[0].setSide(Sides.PLAYER);
     
     // Create the triangle graphics object
     this.dragLine = this.add.graphics();
@@ -90,7 +89,10 @@ class GameScene extends Phaser.Scene {
 
     //start the game logic and ai controllers 
     this.playerManager = new PlayerManager();
-    this.playerManager.addCity(this.cities[0]);
+    this.neutralManager = new NeutralManager();
+    this.cities.forEach(city => city.setSide(Sides.NEUTRAL));
+    this.cities[0].setSide(Sides.PLAYER);
+    
   } 
 
   update() {
@@ -135,7 +137,7 @@ class GameScene extends Phaser.Scene {
    */
   cityClick(pointer, city) { 
     this.pointerLocation = [pointer.x, pointer.y];
-    console.log(`City Click at ${this.pointerLocation})`);
+    // console.log(`City Click at ${this.pointerLocation})`);
     if (city.isPlayer()) { 
       this.selected = city; 
     } else if (this.selected != null) { 
@@ -156,7 +158,7 @@ class GameScene extends Phaser.Scene {
    * @param {Phaser.Input.Pointer} pointer 
    */
   backgroundClick(pointer) { 
-    console.log("Background Click");
+    // console.log("Background Click");
     
     this.selected = null;
     this.dragLine.clear();
@@ -191,3 +193,6 @@ const config = {
 }
 
 const game = new Phaser.Game(config)
+
+
+export default GameScene;

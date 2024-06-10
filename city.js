@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Sides, Side} from "./main";
+import GameScene, { Sides, Side} from "./main";
 import settings from "./gamesettings";
 
 
@@ -17,6 +17,7 @@ class City extends Phaser.GameObjects.Container {
         super(scene, x, y);
 
         //class state 
+        /** @type {GameScene} */
         this.scene = scene;
         this.side = side; 
         this.pop = settings.default_pop;
@@ -93,6 +94,8 @@ class City extends Phaser.GameObjects.Container {
 
         this.popTaskID = null; //the task id for the population sending task
 
+        this.setSide = this.setSide.bind(this);
+
     }
 
     incrementPop() {
@@ -158,7 +161,7 @@ class City extends Phaser.GameObjects.Container {
             });
 
         } else { 
-            console.log("Error: popCircle or target is null");
+            console.error("City::sendPop  -> Error: popCircle or target is null");
         }    
         
         //schedule the next pop to be send 
@@ -178,11 +181,9 @@ class City extends Phaser.GameObjects.Container {
     hit(pop, side) {  
         if (this.side == Sides.NEUTRAL) { //for testing purposes only : TODO calculate wether to increase / decrease / change side /etc
             //or use color as a stand in for side? 
-            console.log(`Hit from (${pop.color})`);
             this.pop = this.pop-1; 
             if(this.pop <= 0) { 
                 this.setSide(Sides.PLAYER); 
-                console.log("City Captured TODO: Change color")
             } else { 
                 this.label.setText(`${this.pop}`)
             }
@@ -196,8 +197,27 @@ class City extends Phaser.GameObjects.Container {
      * @param {Side} newSide 
      */
     setSide(newSide) { 
+        //TODO remove the city from the old side manager
         this.side = newSide;
         this.circle.setFillStyle(this.side.color);
+
+        console.log(`City::setSide(${this.side})`);
+        switch (this.side) {
+            case Sides.PLAYER:
+                this.scene.playerManager.addCity(this);
+                break;
+            case Sides.GREEN:
+            case Sides.PURPLE:
+            case Sides.PURPLE: 
+                console.error("AI cities not implemented yet");
+                break;
+            case Sides.NEUTRAL: 
+                this.scene.neutralManager.addCity(this);
+                break;
+            default:
+                console.error("City::setSide() - invalid side");
+                break;
+        }
     }
 
 

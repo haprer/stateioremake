@@ -32,6 +32,13 @@ class SideManager {
         clearInterval(this.timerID);
     }
 
+    addCity(city) {
+        this.cities.add(city);
+    }
+
+    removeCity(city) {
+        this.cities.delete(city);
+    }
 
 }
 
