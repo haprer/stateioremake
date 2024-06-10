@@ -28,6 +28,9 @@ var settings = {
 
     /** @type {integer} - the population gain rate for enemy cities */
     enemy_pop_rate: 400, //ms
+
+    /** @type {number} */
+    ai_decision_rate: .3, // fractional probability of the ai choosing to attack on any given update
 }
 
 

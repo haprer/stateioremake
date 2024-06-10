@@ -32,13 +32,7 @@ class PlayerManager extends SideManager {
             });
         }
 
-        addCity(city) {
-            this.cities.add(city);
-        }
 
-        removeCity(city) {
-            this.cities.delete(city);
-        }
 
 }
 
