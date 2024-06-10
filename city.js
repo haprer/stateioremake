@@ -179,17 +179,18 @@ class City extends Phaser.GameObjects.Container {
      * The circle will be removed and the population of the city will be updated  
      */
     hit(pop, side) {  
-        if (this.side == Sides.NEUTRAL) { //for testing purposes only : TODO calculate wether to increase / decrease / change side /etc
-            //or use color as a stand in for side? 
+        if (side == this.side) {
+            this.pop++;
+            this.label.setText(`${this.pop}`);
+        } else {
             this.pop = this.pop-1; 
             if(this.pop <= 0) { 
-                this.setSide(Sides.PLAYER); 
+                this.setSide(side); 
             } else { 
                 this.label.setText(`${this.pop}`)
             }
-            
-
         }
+        pop.destroy();
     }
 
     /**

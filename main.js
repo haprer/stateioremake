@@ -137,20 +137,25 @@ class GameScene extends Phaser.Scene {
    */
   cityClick(pointer, city) { 
     this.pointerLocation = [pointer.x, pointer.y];
+
+    //decide what to do based on the currently selected city and the recent click 
     // console.log(`City Click at ${this.pointerLocation})`);
-    if (city.isPlayer()) { 
-      this.selected = city; 
-    } else if (this.selected != null) { 
-      //the selected city sends its pop to the new city, capturing it if possible.
-      //create a web worker to handle the transfer of population
+    if (this.selected == null && city.isPlayer()) { //this is the first click on a city, there is not a previous drag so set selected and finish
+      this.selected = city;
+      return;
+    }
+    //this click is on a new city, so start sending the population
+    if (city != this.selected) { 
       this.selected.sendPopTo(city);
       console.log(`Population send started`);
-
-      //get rid of the drag graphics. 
-      this.selected = null;
-      this.dragLine.clear(); 
-      this.dragLine.setVisible(false); 
     }
+    //the selected city sends its pop to the new city, capturing it if possible.
+    //create a web worker to handle the transfer of population
+    //wether population is being sent or this is the second click on the same city -> cancel the drag line 
+    this.selected = null;
+    this.dragLine.clear(); 
+    this.dragLine.setVisible(false); 
+    
   }
 
   /**
@@ -178,7 +183,7 @@ const config = {
     default: "arcade",
     arcade: {
       gravity: {y:0},
-      debug:true
+      debug:false
     }
   },
   //scaling - requires more work to dynamically rescale images to fit - done in a method with a resize event listener that just 
