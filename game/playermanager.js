@@ -1,6 +1,6 @@
-import City from "./city.js";
+import City from "../city.js";
 import SideManager from "./sidemanager.js";
-import { Sides, Side } from "./main.js";
+import { Sides, Side } from "../main.js";
 import settings from "./gamesettings.js";
 
 

@@ -1,7 +1,7 @@
 
 
-import City from "./city.js";
-import { Sides, Side } from "./main.js";
+import City from "../city.js";
+import { Sides, Side } from "../main.js";
 import settings from "./gamesettings.js";
 
 

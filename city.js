@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import GameScene, { Sides, Side} from "./main";
-import settings from "./gamesettings";
+import settings from "./game/gamesettings";
 
 
 export const default_radius = 10;
@@ -131,7 +131,7 @@ class City extends Phaser.GameObjects.Container {
      * 
      * @param {City} target 
      * @param {integer} remaining 
-     * @returns 
+     * 
      */
     sendPop(target, remaining) { 
         if (remaining <= 0) { 

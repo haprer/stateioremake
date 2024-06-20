@@ -1,8 +1,8 @@
 import './style.css'
 import Phaser from 'phaser'
 import City from './city';
-import PlayerManager from './playermanager';
-import NeutralManager from './neutralmanager';
+import PlayerManager from './game/playermanager';
+import NeutralManager from './game/neutralmanager';
 
 
 
@@ -61,6 +61,11 @@ class GameScene extends Phaser.Scene {
   create() {
     this.background = this.add.image(0,0, "usaMap").setOrigin(0,0).setInteractive();
     this.popGroup = this.physics.add.group(); // Group for pop objects
+      //collision rules for the pop objects -> enemies should kill eachother and allies should pass through eachother. 
+      // Manage collisions between the moving populations 
+      this.physics.add.overlap(this.popGroup, this.popGroup, (pop1, pop2) => { 
+
+      });
 
 
     for (let i = 0; i < 7; i++) { 
@@ -80,11 +85,7 @@ class GameScene extends Phaser.Scene {
     this.background.on(Phaser.Input.Events.POINTER_DOWN, this.backgroundClick, this);
 
 
-    // Manage collisions between the moving populations 
-    this.physics.add.collider(this.popGroup, this.popGroup, (popCircle1, popCircle2) => {
-      //TODO: If they are not from the same side, they both die
-      //otherwise pass over eachother. (TODO: test is this default behavior?)
-    });
+
 
 
     //start the game logic and ai controllers 
