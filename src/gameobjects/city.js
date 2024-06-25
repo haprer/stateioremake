@@ -1,6 +1,6 @@
 import Phaser from "phaser";
-import GameScene, { Sides, Side} from "./main";
-import settings from "./game/gamesettings";
+import GameScene, { Sides, Side} from "/src/main.js";
+import settings from "/src/gamesettings.js";
 
 
 export const default_radius = 10;

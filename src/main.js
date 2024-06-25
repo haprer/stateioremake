@@ -1,8 +1,8 @@
-import './style.css'
+import '/style.css'
 import Phaser from 'phaser'
-import City from './city';
-import PlayerManager from './game/playermanager';
-import NeutralManager from './game/neutralmanager';
+import City from '/src/gameobjects/city.js';
+import PlayerManager from '/src/playermanager.js';
+import NeutralManager from '/src/neutralmanager.js';
 
 
 
