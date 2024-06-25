@@ -6,7 +6,7 @@
 var settings = {
 
     /** @type {integer} - the handle logic and make decisions */
-    side_update_rate: 3000, //ms
+    side_update_rate: 1000, //ms
 
     /** @type {integer} - the rate at which population is released when moving */
     pop_rate: 150, //ms
@@ -30,7 +30,7 @@ var settings = {
     enemy_pop_rate: 400, //ms
 
     /** @type {number} */
-    ai_decision_rate: .3, // fractional probability of the ai choosing to attack on any given update
+    ai_decision_rate: .2, // fractional probability of the ai choosing to attack on any given update
 }
 
 

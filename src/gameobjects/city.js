@@ -147,6 +147,9 @@ class City extends Phaser.GameObjects.Container {
         }
         
         const popCircle = this.scene.add.circle(this.x, this.y, 5, this.side.color, 1);
+        //important: Set the side of the circle - all circles must have a set side 
+        popCircle.side = this.side;
+        
         this.scene.physics.add.existing(popCircle);
         this.popGroup.add(popCircle);
         this.pop--; 
@@ -198,18 +201,42 @@ class City extends Phaser.GameObjects.Container {
      * @param {Side} newSide 
      */
     setSide(newSide) { 
-        //TODO remove the city from the old side manager
+
+        //take this side out of the current manager 
+        switch (this.side) { 
+            case Sides.PLAYER: 
+                this.scene.playerManager.removeCity(this);
+                break;
+            case Sides.RED: 
+                this.scene.redManager.removeCity(this);
+                break;
+            case Sides.GREEN: 
+            case Sides.PURPLE: 
+                console.error("Green and Purple cities not implemented yet");
+                break;
+            case Sides.NEUTRAL: 
+                this.scene.neutralManager.removeCity(this);
+                break;
+            default: 
+                console.error("City::setSide() - invalid side");
+                break;
+        }
+
+        //change the color
         this.side = newSide;
         this.circle.setFillStyle(this.side.color);
 
+        //add this city to the new manager
         console.log(`City::setSide(${this.side})`);
         switch (this.side) {
             case Sides.PLAYER:
                 this.scene.playerManager.addCity(this);
                 break;
+            case Sides.RED:
+                this.scene.redManager.addCity(this);
+                break;
             case Sides.GREEN:
             case Sides.PURPLE:
-            case Sides.PURPLE: 
                 console.error("AI cities not implemented yet");
                 break;
             case Sides.NEUTRAL: 

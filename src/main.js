@@ -3,7 +3,7 @@ import Phaser from 'phaser'
 import City from '/src/gameobjects/city.js';
 import PlayerManager from '/src/playermanager.js';
 import NeutralManager from '/src/neutralmanager.js';
-
+import AIManager from '/src/aimanager.js';
 
 
 const bgSize = 500;
@@ -64,7 +64,10 @@ class GameScene extends Phaser.Scene {
       //collision rules for the pop objects -> enemies should kill eachother and allies should pass through eachother. 
       // Manage collisions between the moving populations 
       this.physics.add.overlap(this.popGroup, this.popGroup, (pop1, pop2) => { 
-
+        if (pop1.side != pop2.side) { 
+          pop1.destroy();
+          pop2.destroy();
+        }
       });
 
 
@@ -85,14 +88,13 @@ class GameScene extends Phaser.Scene {
     this.background.on(Phaser.Input.Events.POINTER_DOWN, this.backgroundClick, this);
 
 
-
-
-
     //start the game logic and ai controllers 
     this.playerManager = new PlayerManager();
     this.neutralManager = new NeutralManager();
+    this.redManager = new AIManager(Sides.RED, this.cities);
     this.cities.forEach(city => city.setSide(Sides.NEUTRAL));
-    this.cities[0].setSide(Sides.PLAYER);
+    this.cities[3].setSide(Sides.PLAYER);
+    this.cities[6].setSide(Sides.RED);
     
   } 
 
@@ -141,8 +143,11 @@ class GameScene extends Phaser.Scene {
 
     //decide what to do based on the currently selected city and the recent click 
     // console.log(`City Click at ${this.pointerLocation})`);
-    if (this.selected == null && city.isPlayer()) { //this is the first click on a city, there is not a previous drag so set selected and finish
-      this.selected = city;
+    if (this.selected == null) { //this is the first click on a city, there is not a previous drag so set selected and finish
+      if (city.isPlayer()) { 
+        this.selected = city;
+        return; 
+      }
       return;
     }
     //this click is on a new city, so start sending the population

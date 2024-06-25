@@ -28,6 +28,7 @@ class PlayerManager extends SideManager {
          */
         increasePopulation() {
             this.cities.forEach(city => {
+                // console.log(`PlayerManager::increasePopulation() city at ${city.x}, ${city.y}`);
                 if (city.pop < settings.max_pop) city.incrementPop();
             });
         }

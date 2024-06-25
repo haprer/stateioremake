@@ -18,6 +18,7 @@ class NeutralManager extends SideManager {
 
     increasePopulation() { 
         this.cities.forEach(city => {
+            // console.log(`AIManager::increasePopulation() city at ${city.x}, ${city.y}`);
             if (city.pop < settings.neutral_max_pop) city.incrementPop();
         }); 
     }
